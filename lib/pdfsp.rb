@@ -35,9 +35,14 @@ DOC
 			return pdf, pages_arr
 		end
 
-
-
-
+		def ranges(page_cuts)
+			result_arr = []
+			page_cuts.inject(1) do | start, next_cut |
+				result_arr << (start == next_cut ? start.to_s : "#{start}-#{next_cut}")
+				next_cut + 1
+			end
+			result_arr
+		end
 
 		def get_no_pages(pdf)
 			result_string, _ = @cmd.call("pdftk #{pdf} dump_data | grep NumberOfPages")

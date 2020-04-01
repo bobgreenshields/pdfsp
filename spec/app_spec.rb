@@ -50,6 +50,35 @@ describe App do
 		end
 	end
 
+	describe '#ranges' do
+		it 'outputs individual pages without a hyphen' do
+			cmd_dbl = double
+			app = App.new(cmd: cmd_dbl)
+			expect(app.ranges([1,2,3,5])[0]).to eql "1"
+			expect(app.ranges([1,2,3,5])[1]).to eql "2"
+			expect(app.ranges([1,2,3,5])[2]).to eql "3"
+		end
+		it 'outputs ranges with a hyphen' do
+			cmd_dbl = double
+			app = App.new(cmd: cmd_dbl)
+			expect(app.ranges([1,2,3,5])[3]).to eql "4-5"
+		end
+		it 'outputs the correct number of ranges' do
+			cmd_dbl = double
+			app = App.new(cmd: cmd_dbl)
+			expect(app.ranges([1,2,5,6,8,12,13]).length).to eql 7
+		end
+		it 'outputs the correct ranges' do
+			cmd_dbl = double
+			app = App.new(cmd: cmd_dbl)
+			ranges = app.ranges([1,2,5,6,8,12,13])
+			expected = %w(1 2 3-5 6 7-8 9-12 13)
+			ranges.each_with_index do | range, index |
+				expect(range).to eql expected[index]
+			end
+		end
+	end
+
 	describe '#get_no_pages' do
 		it 'returns the number of pages in the pdf' do
 			pdf = "~/scan.pdf"
