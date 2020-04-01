@@ -9,6 +9,19 @@ This application requires pdftk to be installed on the system.
 It does not appear to be present.
 DOC
 
+NOT_ENOUGH_ARGS = <<-DOC
+pdfsp needs to be run with a file name and then a list of pages to split after
+e.g.
+
+$ pdfsp ~/scan.pdf 1 3
+
+This will split the scan.pdf after the end of page 1, then after the end of page 3 and then to the end
+
+i.e. pages 1, 2-3, 4-end
+
+it will output these pdfs as ~/scan_1.pdf scan_2.pdf and scan_3.pdf
+DOC
+
 	class PdfspError < StandardError; end
 
 	class App
@@ -16,16 +29,14 @@ DOC
 			@cmd = cmd
 		end
 
-		def check_for_pdftk
+		def pdftk_present?
 			_, found = @cmd.call('which pdftk')
 			found
 		end
 
 		def call(arg_arr)
-			unless check_for_pdftk
-				puts NO_PDFTK
-				exit(67)
-			end
+			exit_not_enough_args unless arg_arr.length > 1
+			exit_no_pdftk unless pdftk_present?
 			@pdf, page_arr = process_args(arg_arr)
 		end
 
@@ -49,6 +60,15 @@ DOC
 			result_string.split(':')[1].strip.to_i
 		end
 
+		def exit_no_pdftk
+			puts NO_PDFTK
+			exit(67)
+		end
+
+		def exit_not_enough_args
+			puts NOT_ENOUGH_ARGS
+			exit(68)
+		end
 		
 	end
 end

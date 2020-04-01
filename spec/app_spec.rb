@@ -3,13 +3,13 @@ require_relative '../lib/pdfsp'
 include Pdfsp
 
 describe App do
-	describe '#check_for_pdftk' do
+	describe '#pdftk_present?' do
 		context 'when present' do
 			it 'returns true' do
 				cmd_dbl = double
 				allow(cmd_dbl).to receive(:call).and_return(["", true])
 				app = App.new(cmd: cmd_dbl)
-				expect(app.check_for_pdftk).to be_truthy
+				expect(app.pdftk_present?).to be_truthy
 			end
 		end
 		context 'when not present' do
@@ -17,7 +17,7 @@ describe App do
 				cmd_dbl = double
 				allow(cmd_dbl).to receive(:call).and_return(["", false])
 				app = App.new(cmd: cmd_dbl)
-				expect(app.check_for_pdftk).to be_falsey
+				expect(app.pdftk_present?).to be_falsey
 			end
 		end
 	end
