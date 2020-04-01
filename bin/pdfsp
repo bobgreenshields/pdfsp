@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative 'lib/pdfsp'
+require_relative '../lib/pdfsp'
 
 Pdfsp::App.new.call(ARGV)
