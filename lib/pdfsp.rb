@@ -9,8 +9,8 @@ This application requires pdftk to be installed on the system.
 It does not appear to be present.
 DOC
 
-NOT_ENOUGH_ARGS = <<-DOC
-pdfsp needs to be run with a file name and then a list of pages to split after
+	HELP = <<-DOC
+pdfsp needs to be run with a file name and then a list of pages to split after.
 e.g.
 
 $ pdfsp ~/scan.pdf 1 3
@@ -35,15 +35,37 @@ DOC
 		end
 
 		def call(arg_arr)
-			exit_not_enough_args unless arg_arr.length > 1
+			@arg_arr = arg_arr
 			exit_no_pdftk unless pdftk_present?
-			@pdf, page_arr = process_args(arg_arr)
+			exit_not_enough_args unless arg_arr.length > 1
+			@pdf = Pathname.new(arg_arr[0])
+			exit_not_a_pdf unless @pdf.extname == '.pdf'
+			exit_pdf_not_exist unless @pdf.exist?
+			exit_pages_not_integers unless pages_are_integers?(arg_arr)
+			exit_duplicate_pages if has_duplicates?(pages)
 		end
 
-		def process_args(arg_arr)
-			pdf = Pathname.new(arg_arr[0])
-			pages_arr = arg_arr[1..-1].map(&:to_i).sort
-			return pdf, pages_arr
+		def pages_are_integers?(arg_arr)
+			test = /^\s*\d+\s*$/
+			arg_arr[1..-1].reject do | page |
+				test.match(page)
+			end.length == 0
+		end
+
+		def has_duplicates?(page_arr)
+			page_arr.inject(0)  do | last, current |
+				return true if current == last
+				current
+			end
+			return false
+		end
+
+		def pages
+			@pages ||= get_pages(@arg_arr)
+		end
+
+		def get_pages(arg_arr)
+			arg_arr[1..-1].map(&:strip).map(&:to_i).sort
 		end
 
 		def ranges(page_cuts)
@@ -66,9 +88,41 @@ DOC
 		end
 
 		def exit_not_enough_args
-			puts NOT_ENOUGH_ARGS
+			puts "pdfsp was not called with enough arguments.  It must have at least two"
+			puts
+			puts HELP
 			exit(68)
 		end
-		
+
+		def exit_not_a_pdf
+			puts "#{@pdf} is not a pdf - it doesn't end in .pdf"
+			puts
+			puts "run pdfsp with no arguments for help."
+			exit(69)
+		end
+
+		def exit_pdf_not_exist
+			puts "#{@pdf} does not exist"
+			puts
+			puts "run pdfsp with no arguments for help."
+			exit(70)
+		end
+
+		def exit_pages_not_integers
+			puts "Your list of pages contains items that are not numbers"
+			puts @arg_arr[1..-1].map(&:strip).join(" ")
+			puts
+			puts "run pdfsp with no arguments for help."
+			exit(71)
+		end
+
+		def exit_duplicate_pages
+			puts "Your list of pages contains duplicates"
+			puts pages.map(&:to_s).join(' ')
+			puts
+			puts "run pdfsp with no arguments for help."
+			exit(72)
+		end
+
 	end
 end

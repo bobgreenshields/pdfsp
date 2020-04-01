@@ -22,30 +22,65 @@ describe App do
 		end
 	end
 
-	describe 'process_args' do
-		context 'when first arg is a filename' do
-			it 'returns a pathname of the file' do
-				args = ["/home/bobg/scan.pdf", 3, 5, 6]
+	describe '#pages are integers?' do
+		context 'when integers (including whitespace) are passed' do
+			it 'returns true' do
 				cmd_dbl = double
+				allow(cmd_dbl).to receive(:call).and_return(["", false])
 				app = App.new(cmd: cmd_dbl)
-				pdf, _ = app.process_args(args)
-				expect(pdf).to be_a Pathname
-				expect(pdf.to_s).to eql "/home/bobg/scan.pdf"
+				args = ["/home/bobg/scans.pdf", "3", "  6 ", " 8", "4 ", "10"]
+				expect(app.pages_are_integers?(args)).to be_truthy
 			end
-			it 'returns an array of the page numbers' do
-				args = ["/home/bobg/scan.pdf", 3, 5, 6]
+		end
+		context 'when non-integers (including whitespace) are passed' do
+			it 'returns false' do
 				cmd_dbl = double
+				allow(cmd_dbl).to receive(:call).and_return(["", false])
 				app = App.new(cmd: cmd_dbl)
-				_, pages = app.process_args(args)
-				expect(pages).to eql [3,5,6]
+				args = ["/home/bobg/scans.pdf", "3", "  6 ", " 3h", "4 ", "10"]
+				expect(app.pages_are_integers?(args)).to be_falsey
 			end
-			it 'sorts the page munbers' do
-				args = ["/home/bobg/scan.pdf", 6, 5, 3]
+		end
+	end
+
+	describe '#get_pages' do
+		it 'returns an array of integers' do
+			cmd_dbl = double
+			allow(cmd_dbl).to receive(:call).and_return(["", false])
+			app = App.new(cmd: cmd_dbl)
+			args = ["/home/bobg/scans.pdf", "8", "  6 ", " 3", "4 ", "10"]
+			pages = app.get_pages(args)
+			expect(pages).to be_a Array
+			pages.each do | page |
+				expect(page).to be_a Integer
+			end
+		end
+		it 'returns a sorted array' do
+			cmd_dbl = double
+			allow(cmd_dbl).to receive(:call).and_return(["", false])
+			app = App.new(cmd: cmd_dbl)
+			args = ["/home/bobg/scans.pdf", "8", "  6 ", " 3", "4 ", "10"]
+			expect(app.get_pages(args)).to eql [3,4,6,8,10]
+		end
+	end
+
+	describe '#has_duplicates?' do
+		context 'when no dups exist' do
+			it 'returns false' do
 				cmd_dbl = double
+				allow(cmd_dbl).to receive(:call).and_return(["", false])
 				app = App.new(cmd: cmd_dbl)
-				_, pages = app.process_args(args)
-				expect(pages).to eql [3,5,6]
-				
+				page_arr = [1, 3, 4, 8, 22]
+				expect(app.has_duplicates?(page_arr)).to be_falsey
+			end
+		end
+		context 'when dups exist' do
+			it 'returns true' do
+				cmd_dbl = double
+				allow(cmd_dbl).to receive(:call).and_return(["", false])
+				app = App.new(cmd: cmd_dbl)
+				page_arr = [1, 3, 4, 4, 8, 22]
+				expect(app.has_duplicates?(page_arr)).to be_truthy
 			end
 		end
 	end
