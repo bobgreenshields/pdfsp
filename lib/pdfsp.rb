@@ -83,44 +83,44 @@ DOC
 		end
 
 		def exit_no_pdftk
-			puts NO_PDFTK
+			STDERR.puts NO_PDFTK
 			exit(67)
 		end
 
 		def exit_not_enough_args
-			puts "pdfsp was not called with enough arguments.  It must have at least two"
-			puts
-			puts HELP
+			STDERR.puts "pdfsp was not called with enough arguments.  It must have at least two"
+			STDERR.puts
+			STDERR.puts HELP
 			exit(68)
 		end
 
 		def exit_not_a_pdf
-			puts "#{@pdf} is not a pdf - it doesn't end in .pdf"
-			puts
-			puts "run pdfsp with no arguments for help."
+			STDERR.puts "#{@pdf} is not a pdf - it doesn't end in .pdf"
+			STDERR.puts
+			STDERR.puts "run pdfsp with no arguments for help."
 			exit(69)
 		end
 
 		def exit_pdf_not_exist
-			puts "#{@pdf} does not exist"
-			puts
-			puts "run pdfsp with no arguments for help."
+			STDERR.puts "#{@pdf} does not exist"
+			STDERR.puts
+			STDERR.puts "run pdfsp with no arguments for help."
 			exit(70)
 		end
 
 		def exit_pages_not_integers
-			puts "Your list of pages contains items that are not numbers"
-			puts @arg_arr[1..-1].map(&:strip).join(" ")
-			puts
-			puts "run pdfsp with no arguments for help."
+			STDERR.puts "Your list of pages contains items that are not numbers"
+			STDERR.puts @arg_arr[1..-1].map(&:strip).join(" ")
+			STDERR.puts
+			STDERR.puts "run pdfsp with no arguments for help."
 			exit(71)
 		end
 
 		def exit_duplicate_pages
-			puts "Your list of pages contains duplicates"
-			puts pages.map(&:to_s).join(' ')
-			puts
-			puts "run pdfsp with no arguments for help."
+			STDERR.puts "Your list of pages contains duplicates"
+			STDERR.puts pages.map(&:to_s).join(' ')
+			STDERR.puts
+			STDERR.puts "run pdfsp with no arguments for help."
 			exit(72)
 		end
 
