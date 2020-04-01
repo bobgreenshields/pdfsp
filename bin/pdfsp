@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+
+require 'pathname'
+require_relative 'lib/pdfsp'
+
+NO_ARGS = <<-DOC
+pdfsp needs to be run with a file name and then a list of pages to split after
+e.g.
+
+$ pdfsp ~/scan.pdf 1 3
+
+This will split the scan.pdf upto the end of page 1, then upto the end of page 3 and then to the end
+
+i.e. pages 1, 2-3, 4-end
+
+it will output these pdfs as ~/scan_1.pdf scan_2.pdf and scan_3.pdf
+DOC
+
+if ARGV.length == 0
+	puts NO_ARGS
+	exit(68)
+end
+
+Pdfsp::App.new.call(ARGV)
+
+# if ARGV.length == 1
+# 	p = Pathname.new(ARGV[0])
+# 	if p.exist?
+# 		puts "File exists: #{p}"
+# 	else
+# 		puts "File does not exist: #{p}"
+# 	end
+
+# 	exit(0)
+# end
