@@ -35,15 +35,34 @@ DOC
 		end
 
 		def call(arg_arr)
+			# arg_arr.each { |arg| puts arg }
 			STDERR.puts HELP if arg_arr.length == 0
 			exit_no_pdftk unless pdftk_present?
 			extract_args(arg_arr)
 			@ranges = ranges(@pages)
-			puts "pdf is #{@pdf}"
-			puts "dest dir is #{@dest_dir}"
-			puts "page list is " + @pages.map(&:to_s).join(" ")
-			puts "range list is " + @ranges.map(&:to_s).join(" ")
+			# puts "pdf is #{@pdf}"
+			# puts "dest dir is #{@dest_dir}"
+			# puts "number of pages is #{no_pages}"
+			# puts "page list is " + @pages.map(&:to_s).join(" ")
+			# puts "range list is " + @ranges.map(&:to_s).join(" ")
+			# puts "cmds are:"
+			# cmd_strings.each { |cmd| puts cmd }
+			cmd_strings.each do | cmd_str |
+				_, success = @cmd.call(cmd_str)
+				exit(78) unless success
+			end
 			exit(0)
+		end
+
+		def esc(file)
+			file.to_s.gsub(' ', '\ ')
+		end
+
+		def cmd_strings
+			@ranges.map do | range |
+				dest = @dest_dir + "#{@pdf.basename.to_s.delete_suffix('.pdf')}_#{range}.pdf"
+				"pdftk #{esc(@pdf)} cat #{range} output #{esc(dest)}"
+			end
 		end
 
 		def extract_args(arg_arr)
@@ -121,7 +140,7 @@ DOC
 		end
 
 		def get_no_pages(pdf)
-			result_string, _ = @cmd.call("pdftk #{pdf} dump_data | grep NumberOfPages")
+			result_string, _ = @cmd.call("pdftk #{esc(pdf)} dump_data | grep NumberOfPages")
 			result_string.split(':')[1].strip.to_i
 		end
 

@@ -48,7 +48,7 @@ describe App do
 			cmd_dbl = double
 			allow(cmd_dbl).to receive(:call).and_return(["", false])
 			app = App.new(cmd: cmd_dbl)
-			args = ["/home/bobg/scans.pdf", "8", "  6 ", " 3", "4 ", "10"]
+			args = ["8", "  6 ", " 3", "4 ", "10"]
 			pages = app.get_pages(args)
 			expect(pages).to be_a Array
 			pages.each do | page |
@@ -59,7 +59,7 @@ describe App do
 			cmd_dbl = double
 			allow(cmd_dbl).to receive(:call).and_return(["", false])
 			app = App.new(cmd: cmd_dbl)
-			args = ["/home/bobg/scans.pdf", "8", "  6 ", " 3", "4 ", "10"]
+			args = ["8", "  6 ", " 3", "4 ", "10"]
 			expect(app.get_pages(args)).to eql [3,4,6,8,10]
 		end
 	end
