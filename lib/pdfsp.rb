@@ -35,20 +35,63 @@ DOC
 		end
 
 		def call(arg_arr)
-			@arg_arr = arg_arr
+			STDERR.puts HELP if arg_arr.length == 0
 			exit_no_pdftk unless pdftk_present?
+			extract_args(arg_arr)
+			@ranges = ranges(@pages)
+			puts "pdf is #{@pdf}"
+			puts "dest dir is #{@dest_dir}"
+			puts "page list is " + @pages.map(&:to_s).join(" ")
+			puts "range list is " + @ranges.map(&:to_s).join(" ")
+			exit(0)
+		end
+
+		def extract_args(arg_arr)
 			exit_not_enough_args unless arg_arr.length > 1
-			@pdf = Pathname.new(arg_arr[0])
+			next_args = set_pdf(arg_arr)
+			next_args = set_dest_dir(next_args)
+			next_args = set_pages(next_args)
+		end
+
+		def set_pdf(arg_arr)
+			@pdf = Pathname.new(arg_arr[0]).expand_path
 			exit_not_a_pdf unless @pdf.extname == '.pdf'
 			exit_pdf_not_exist unless @pdf.exist?
+			arg_arr[1..-1]
+		end
+
+		def set_dest_dir(arg_arr)
+			exit_not_enough_args unless arg_arr.length > 0
+			if integer_test.match(arg_arr[0])
+				@dest_dir = Pathname.pwd.expand_path
+				arg_arr
+			else
+				@dest_dir = Pathname.new(arg_arr[0])
+				exit_dest_not_exist unless @dest_dir.exist?
+				exit_dest_not_dir unless @dest_dir.directory?
+				@dest_dir = @dest_dir.expand_path
+				arg_arr[1..-1]
+			end
+		end
+
+		def set_pages(arg_arr)
+			exit_not_enough_args unless arg_arr.length > 0
 			exit_pages_not_integers unless pages_are_integers?(arg_arr)
-			exit_duplicate_pages if has_duplicates?(pages)
+			@pages = get_pages(arg_arr)
+			exit_not_enough_args unless arg_arr.length > 0
+			exit_duplicate_pages if has_duplicates?(@pages)
+			exit_too_many_pages if (@pages[-1] > no_pages)
+			@pages << no_pages unless @pages[-1] == no_pages
+			[]
+		end
+
+		def integer_test
+			@integer_test ||= /^\s*\d+\s*$/
 		end
 
 		def pages_are_integers?(arg_arr)
-			test = /^\s*\d+\s*$/
 			arg_arr[1..-1].reject do | page |
-				test.match(page)
+				integer_test.match(page)
 			end.length == 0
 		end
 
@@ -60,12 +103,8 @@ DOC
 			return false
 		end
 
-		def pages
-			@pages ||= get_pages(@arg_arr)
-		end
-
 		def get_pages(arg_arr)
-			arg_arr[1..-1].map(&:strip).map(&:to_i).sort
+			arg_arr.map(&:strip).map(&:to_i).sort
 		end
 
 		def ranges(page_cuts)
@@ -75,6 +114,10 @@ DOC
 				next_cut + 1
 			end
 			result_arr
+		end
+
+		def no_pages
+			@no_pages ||= get_no_pages(@pdf)
 		end
 
 		def get_no_pages(pdf)
@@ -88,39 +131,70 @@ DOC
 		end
 
 		def exit_not_enough_args
-			STDERR.puts "pdfsp was not called with enough arguments.  It must have at least two"
+			STDERR.puts "pdfsp was not called with enough arguments."
+			STDERR.puts "If called without a destination dir it needs two."
+			STDERR.puts "If called with a destination dir it needs three."
 			STDERR.puts
-			STDERR.puts HELP
+			STDERR.puts "Run pdfsp with no arguments for help."
 			exit(68)
 		end
 
 		def exit_not_a_pdf
+			STDERR.puts "The first argument should be a pdf to split."
 			STDERR.puts "#{@pdf} is not a pdf - it doesn't end in .pdf"
 			STDERR.puts
-			STDERR.puts "run pdfsp with no arguments for help."
+			STDERR.puts "Run pdfsp with no arguments for help."
 			exit(69)
 		end
 
 		def exit_pdf_not_exist
+			STDERR.puts "The first argument should be a pdf to split."
 			STDERR.puts "#{@pdf} does not exist"
 			STDERR.puts
-			STDERR.puts "run pdfsp with no arguments for help."
+			STDERR.puts "Run pdfsp with no arguments for help."
 			exit(70)
+		end
+
+		def exit_dest_not_exist
+			STDERR.puts "If the second argument is not the start of the page list"
+			STDERR.puts "it should be the destination directory."
+			STDERR.puts "#{@dest_dir} does not exist."
+			STDERR.puts
+			STDERR.puts "Run pdfsp with no arguments for help."
+			exit(72)
+		end
+
+		def exit_dest_not_dir
+			STDERR.puts "If the second argument is not the start of the page list"
+			STDERR.puts "it should be the destination directory."
+			STDERR.puts "#{@dest_dir} exists but is not a valid directory."
+			STDERR.puts
+			STDERR.puts "Run pdfsp with no arguments for help."
+			exit(72)
 		end
 
 		def exit_pages_not_integers
 			STDERR.puts "Your list of pages contains items that are not numbers"
 			STDERR.puts @arg_arr[1..-1].map(&:strip).join(" ")
 			STDERR.puts
-			STDERR.puts "run pdfsp with no arguments for help."
+			STDERR.puts "Run pdfsp with no arguments for help."
 			exit(71)
 		end
 
 		def exit_duplicate_pages
 			STDERR.puts "Your list of pages contains duplicates"
-			STDERR.puts pages.map(&:to_s).join(' ')
+			STDERR.puts @pages.map(&:to_s).join(' ')
 			STDERR.puts
-			STDERR.puts "run pdfsp with no arguments for help."
+			STDERR.puts "Run pdfsp with no arguments for help."
+			exit(72)
+		end
+
+		def exit_too_many_pages
+			STDERR.puts "Your list of pages contains numbers higher than the number of pages in the pdf."
+			STDERR.puts "The page list is #{@pages.map(&:to_s).join(' ')}"
+			STDERR.puts "The number of pages in the pdf is #{no_pages}"
+			STDERR.puts
+			STDERR.puts "Run pdfsp with no arguments for help."
 			exit(72)
 		end
 
