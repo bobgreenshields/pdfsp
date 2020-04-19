@@ -9,9 +9,10 @@ module Pdfsp
 
 		def opt_parser
 			@opt_parser ||= OptionParser.new do | opts |
-				opts.banner = 'Usage: pdfsp filename [options] pagelist'
+				opts.banner = 'Usage: pdfsp [options] filename pagelist'
 				opts.on '-a', '--archive', 'Archive the original file' do @options[:archive] = nil end
 				opts.on '-c', '--cloudfile', 'Output the pages to the cloudfile dir' do @options[:cloudfile] = nil end
+				opts.on '-dDIR', '--destdir=DIR', 'Destination dir for the output pages' do |dir| @options[:destdir] = dir end
 				opts.on '-h', '--help', 'Prints this help' do puts opts; exit end
 			end
 		end
@@ -24,6 +25,7 @@ module Pdfsp
 			@options[:source] = Pathname.new(args_arr[0]).expand_path
 			check_pagelist_are_integers(args_arr[1..-1])
 			@options[:pagelist] = args_arr[1..-1].map(&:to_i).sort
+			check_valid_dir(@options[:destdir]) if @options.key?(:destdir)
 			@options
 		end
 
@@ -32,7 +34,11 @@ module Pdfsp
 		end
 
 		def check_valid_path(filename)
-			exit_invalid_filename(filename) unless Pathname.new(filename).exist?
+			exit_invalid_filename(filename) unless Pathname.new(filename).file?
+		end
+
+		def check_valid_dir(dir)
+			exit_invalid_dir(dir) unless Pathname.new(filename).directory?
 		end
 
 		def check_is_pdf(filename)
@@ -67,16 +73,22 @@ module Pdfsp
 			exit(66)
 		end
 
+		def exit_invalid_dir(dir)
+			STDERR.puts 'The destination directory should be a valid directory'
+			STDERR.puts "#{filename} is not a valid directory"
+			exit(67)
+		end
+
 		def exit_not_a_pdf(filename)
 			STDERR.puts 'The first argument should be a pdf file to split'
 			STDERR.puts "#{filename} is not a pdf.  It should end in .pdf"
-			exit(67)
+			exit(68)
 		end
 
 		def exit_pagelist_not_integers
 			STDERR.puts 'The second argument onwards should be the list of pages to split after'
 			STDERR.puts "They should all be integers but they weren't"
-			exit(68)
+			exit(69)
 		end
 		
 	end

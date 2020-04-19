@@ -57,7 +57,7 @@ describe Parser do
 	end
 
 	describe '#call' do
-		context 'with options of -fa' do
+		context 'with options of -ca' do
 			let(:args) { ['filename.pdf', '-ca', ' 2', '5'] }
 			it 'returns a hash with the correct keys' do
 				allow(parser).to receive(:check_valid_path).and_return(true)
@@ -92,6 +92,25 @@ describe Parser do
 				expect(result[:pagelist]).to eql [2,5,11]
 			end
 		end
+		context 'with -d and dest dir' do
+			let(:args) { ['-d', 'dest/dir', 'filename.pdf', '-ca', ' 2', '11', '5'] }
+			it 'it places the dest dir under the :destdir key' do
+				allow(parser).to receive(:check_valid_dir)
+				allow(parser).to receive(:check_valid_path)
+				result = parser.call(args)
+				expect(result[:destdir]).to eql 'dest/dir'
+			end
+		end
+		context 'with --destdir=dest/dir' do
+			let(:args) { ['--destdir=dest/dir', 'filename.pdf', '-ca', ' 2', '11', '5'] }
+			it 'it places the dest dir under the :destdir key' do
+				allow(parser).to receive(:check_valid_dir)
+				allow(parser).to receive(:check_valid_path)
+				result = parser.call(args)
+				expect(result[:destdir]).to eql 'dest/dir'
+			end
+		end
+
 	end
 	
 end
