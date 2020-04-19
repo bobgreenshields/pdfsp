@@ -84,6 +84,14 @@ describe Parser do
 				expect(result[:pagelist]).to eql [2,5]
 			end
 		end
+		context 'with out of order integers as the last args' do
+			let(:args) { ['filename.pdf', '-ca', ' 2', '11', '5'] }
+			it 'returns a sorted array of integers in the :pagelist key' do
+				allow(parser).to receive(:check_valid_path).and_return(true)
+				result = parser.call(args)
+				expect(result[:pagelist]).to eql [2,5,11]
+			end
+		end
 	end
 	
 end

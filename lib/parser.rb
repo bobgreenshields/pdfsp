@@ -23,7 +23,7 @@ module Pdfsp
 			check_is_pdf(args_arr[0])
 			@options[:source] = Pathname.new(args_arr[0]).expand_path
 			check_pagelist_are_integers(args_arr[1..-1])
-			@options[:pagelist] = args_arr[1..-1].map(&:to_i)
+			@options[:pagelist] = args_arr[1..-1].map(&:to_i).sort
 			@options
 		end
 
