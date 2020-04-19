@@ -80,7 +80,7 @@ module Pdfsp
 
 		def exit_invalid_dir(dir)
 			STDERR.puts 'The destination directory should be a valid directory'
-			STDERR.puts "#{filename} is not a valid directory"
+			STDERR.puts "#{dir} is not a valid directory"
 			exit(67)
 		end
 
