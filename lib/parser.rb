@@ -20,6 +20,7 @@ module Pdfsp
 		def call(argv)
 			args_arr = opt_parser.parse(argv)
 			check_enough_args(args_arr)
+			check_no_duplicate_dest_dir(@options)
 			check_valid_path(args_arr[0])
 			check_is_pdf(args_arr[0])
 			@options[:source] = Pathname.new(args_arr[0]).expand_path
@@ -44,6 +45,10 @@ module Pdfsp
 		def check_is_pdf(filename)
 			path = Pathname.new(filename)
 			exit_not_a_pdf(path.to_s) unless path.extname.downcase == '.pdf'
+		end
+
+		def check_no_duplicate_dest_dir(options)
+			exit_duplicate_dest_dir if (options.key?(:destdir) && options.key?(:cloudfile))
 		end
 
 		def integer_test
@@ -82,6 +87,12 @@ module Pdfsp
 		def exit_not_a_pdf(filename)
 			STDERR.puts 'The first argument should be a pdf file to split'
 			STDERR.puts "#{filename} is not a pdf.  It should end in .pdf"
+			exit(68)
+		end
+
+		def exit_duplicate_dest_dir
+			STDERR.puts 'The dest dir and cloudfile options both set the destination directory'
+			STDERR.puts 'Please use just one of them to define the destination directory'
 			exit(68)
 		end
 
