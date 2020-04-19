@@ -22,7 +22,7 @@ i.e. pages 1, 2-3, 4-end
 it will output these pdfs as ~/scan_1.pdf scan_2.pdf and scan_3.pdf
 DOC
 
-	class PdfspError < StandardError; end
+	class PdfspError < RuntimeError; end
 
 	class App
 		def initialize(cmd: Command.new)
