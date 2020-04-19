@@ -12,7 +12,7 @@ module Pdfsp
 				opts.banner = 'Usage: pdfsp [options] filename pagelist'
 				opts.on '-a', '--archive', 'Archive the original file' do @options[:archive] = nil end
 				opts.on '-c', '--cloudfile', 'Output the pages to the cloudfile dir' do @options[:cloudfile] = nil end
-				opts.on '-dDIR', '--destdir=DIR', 'Destination dir for the output pages' do |dir| @options[:destdir] = dir end
+				opts.on '-dDIR', '--destdir=DIR', 'Destination dir for the output pages' do |dir| @options[:destdir] = Pathname.new(dir).expand_path end
 				opts.on '-h', '--help', 'Prints this help' do puts opts; exit end
 			end
 		end
@@ -39,7 +39,7 @@ module Pdfsp
 		end
 
 		def check_valid_dir(dir)
-			exit_invalid_dir(dir) unless Pathname.new(filename).directory?
+			exit_invalid_dir(dir) unless Pathname.new(dir).directory?
 		end
 
 		def check_is_pdf(filename)
