@@ -1,5 +1,10 @@
 #!/usr/bin/ruby
 
-require_relative '../lib/pdfsp'
+require_relative '../lib/app'
+require_relative '../lib/parser'
+require_relative '../lib/rc_file'
 
-Pdfsp::App.new.call(ARGV)
+RC_FILE = Pathname.new(ENV['HOME']) + '.pdfsprc'
+options = Pdfsp::Parser.new.call(ARGV)
+settings = Pdfsp::RCFile.new.call(RC_FILE)
+Pdfsp::App.new(settings: settings, options: options).call
