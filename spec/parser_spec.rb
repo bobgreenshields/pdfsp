@@ -94,11 +94,15 @@ describe Parser do
 		end
 		context 'with -d and dest dir' do
 			let(:args) { ['-d', 'dest/dir', 'filename.pdf', '-a', ' 2', '11', '5'] }
+			it 'it returns a Pathname' do
+				allow(parser).to receive(:check_valid_dir)
+				allow(parser).to receive(:check_valid_path)
+				expect(parser.call(args)[:destdir]).to be_a(Pathname)
+			end
 			it 'it places the dest dir under the :destdir key' do
 				allow(parser).to receive(:check_valid_dir)
 				allow(parser).to receive(:check_valid_path)
-				result = parser.call(args)
-				expect(result[:destdir]).to eql 'dest/dir'
+				expect(parser.call(args)[:destdir]).to eql (Pathname.pwd + 'dest/dir')
 			end
 		end
 		context 'with --destdir=dest/dir' do
@@ -106,8 +110,7 @@ describe Parser do
 			it 'it places the dest dir under the :destdir key' do
 				allow(parser).to receive(:check_valid_dir)
 				allow(parser).to receive(:check_valid_path)
-				result = parser.call(args)
-				expect(result[:destdir]).to eql 'dest/dir'
+				expect(parser.call(args)[:destdir]).to eql (Pathname.pwd + 'dest/dir')
 			end
 		end
 		context 'with cloudfile and destdir options set' do
