@@ -35,7 +35,7 @@ module Pdfsp
 			exit_no_pdftk unless pdftk_present?
 			cmd_strings.each do | cmd_str |
 				_, success = @cmd.call(cmd_str)
-				exit(78) unless success
+				exit(80) unless success
 			end
 			exit_with_0
 		end
@@ -104,36 +104,36 @@ module Pdfsp
 		def exit_no_pdftk
 			STDERR.puts "This application requires pdftk to be installed on the system."
 			STDERR.puts "It does not appear to be present."
-			exit(67)
+			exit(72)
 		end
 		
 		def exit_invalid_cloudfile_dir(dir)
 			STDERR.puts 'The cloudfile directory should be a valid directory'
 			STDERR.puts "#{dir} is not a valid directory"
-			exit(67)
+			exit(73)
 		end
 
 		def exit_cloudfile_not_set
 			STDERR.puts 'The cloudfile directory has not been set in the .pdfsprc file'
 			STDERR.puts 'or there is no .pdfsprc file in your home directory'
-			exit(67)
+			exit(74)
 		end
 
 		def exit_duplicate_pages
 			STDERR.puts "Your list of pages contains duplicates"
-			STDERR.puts @pages.map(&:to_s).join(' ')
+			STDERR.puts @options[:pagelist].map(&:to_s).join(' ')
 			STDERR.puts
 			STDERR.puts "Run pdfsp -h for help."
-			exit(72)
+			exit(75)
 		end
 
 		def exit_too_many_pages
 			STDERR.puts "Your list of pages contains numbers higher than the number of pages in the pdf."
-			STDERR.puts "The page list is #{@pages.map(&:to_s).join(' ')}"
+			STDERR.puts "The page list is #{@options[:pagelist].map(&:to_s).join(' ')}"
 			STDERR.puts "The number of pages in the pdf is #{no_pages}"
 			STDERR.puts
 			STDERR.puts "Run pdfsp -h for help."
-			exit(72)
+			exit(76)
 		end
 
 	end

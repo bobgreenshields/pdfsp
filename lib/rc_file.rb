@@ -27,8 +27,8 @@ module Pdfsp
 				STDERR.puts "There was a problem loading the config file"
 				STDERR.puts path.to_s
 				STDERR.puts "It should be formatted in YAML"
-				STDERR.puts message
-				exit(66)
+				STDERR.puts message.to_s
+				exit(71)
 		end
 
 	end

@@ -93,13 +93,13 @@ module Pdfsp
 		def exit_duplicate_dest_dir
 			STDERR.puts 'The dest dir and cloudfile options both set the destination directory'
 			STDERR.puts 'Please use just one of them to define the destination directory'
-			exit(68)
+			exit(69)
 		end
 
 		def exit_pagelist_not_integers
 			STDERR.puts 'The second argument onwards should be the list of pages to split after'
 			STDERR.puts "They should all be integers but they weren't"
-			exit(69)
+			exit(70)
 		end
 		
 	end
