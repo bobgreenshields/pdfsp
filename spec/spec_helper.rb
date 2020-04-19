@@ -9,6 +9,6 @@ class CmdDbl
 
 	def call(command_str)
 		@calls << command_str
-		true
+		return "", true
 	end
 end
