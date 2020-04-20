@@ -174,7 +174,27 @@ describe App do
 				expect(cmd.calls).to eql(expected)
 			end
 		end
-		
+	end
+
+	describe '#archiver' do
+		context 'when no key in settings' do
+			let(:options) { {} }
+			let(:settings) { {} }
+			it 'returns an ArchiverNull' do
+				expect(app.archiver).to be_a(Archiver::ArchiverNull)
+			end
+		end
+		context 'when correct keys for s3 in settings' do
+			let(:options) { {} }
+			let(:settings) { {'archiver' => archive_settings} }
+			let(:archive_settings) do
+				{'type' => 's3', 'access_key_id' => '', 'secret_access_key' => '', 'bucket' => '' }
+			end
+			it 'returns an ArchiverS3' do
+				expect(app.archiver).to be_a(Archiver::ArchiverS3)
+			end
+		end
+
 	end
 	
 end

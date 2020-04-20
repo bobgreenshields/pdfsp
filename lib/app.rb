@@ -1,5 +1,6 @@
 require 'pathname'
 require_relative 'command'
+require_relative 'archiver'
 
 module Pdfsp
 
@@ -37,6 +38,7 @@ module Pdfsp
 				_, success = @cmd.call(cmd_str)
 				exit(80) unless success
 			end
+			archiver.call(source) if @options.key?(:archive)
 			exit_with_0
 		end
 
@@ -52,6 +54,10 @@ module Pdfsp
 			else
 				@destdir = @options[:destdir] || Pathname.pwd.expand_path
 			end
+		end
+
+		def archiver
+			@archiver ||= Archiver.instance(@settings)
 		end
 
 		def pages
