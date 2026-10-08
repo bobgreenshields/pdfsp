@@ -1,5 +1,4 @@
 require 'pathname'
-require 'aws-sdk-s3'
 
 module Pdfsp
 	module Archiver
@@ -53,6 +52,9 @@ module Pdfsp
 			end
 
 			def get_bucket
+				# Loaded here so pdfsp runs without the aws-sdk-s3 gem
+				# unless the s3 archiver is actually used
+				require 'aws-sdk-s3'
 				credentials = Aws::Credentials.new(@access_key_id, @secret_access_key)
 				s3 = Aws::S3::Resource.new(region: 'eu-west-2', credentials: credentials)
 				s3.bucket(@bucket_name)
